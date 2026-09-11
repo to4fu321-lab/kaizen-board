@@ -1,0 +1,186 @@
+@import "tailwindcss";
+
+@theme {
+  /* ブランド（トラスコ中山のコーポレートカラーを参考にしたオレンジ）。
+     強い色はこれ1色だけ。主ボタンと現在地にしか使わない */
+  --color-brand: #ea5504;
+  --color-brand-dark: #c34503;
+  --color-brand-soft: #fff3ec;
+
+  /* テキスト・面 */
+  --color-ink: #14243a;
+  --color-ink-muted: #5f7086;
+  --color-ink-faint: #94a2b3;
+  --color-surface: #ffffff;
+  --color-canvas: #f4f6f9;
+  --color-line: #e8ecf1;
+
+  /* ステータス（塗らずに小さな丸の色としてだけ使う） */
+  --color-dot-new: #ea5504;
+  --color-dot-reviewing: #d08700;
+  --color-dot-adopted: #0f9d63;
+  --color-dot-partial: #0d93ab;
+  --color-dot-declined: #9aa8b8;
+
+  /* 緊急度（カード左端の帯） */
+  --color-danger: #d92020;
+  --color-warn: #d08700;
+
+  /* 採用ハンコ（朱色。モチベが上がる「押した」感を出す唯一の例外演出） */
+  --color-stamp: #c81e1e;
+
+  --radius-card: 14px;
+
+  --font-sans: var(--font-noto-sans-jp), ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  overscroll-behavior-y: none;
+}
+
+body {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------
+   文字サイズは4段階だけ。数字を見せる場所のみ text-num を例外で使う
+   ------------------------------------------------------------------ */
+@utility text-title {
+  font-size: 1.25rem; /* 20px */
+  line-height: 1.4;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+@utility text-head {
+  font-size: 1rem; /* 16px */
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+@utility text-body {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.7;
+}
+
+@utility text-note {
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.5;
+}
+
+@utility text-num {
+  font-size: 1.75rem; /* 28px */
+  line-height: 1.1;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 面は「枠線のみ・影なし・角丸1種類」で統一。入れ子の枠は作らない */
+@utility card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes kb-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@utility animate-pop {
+  animation: kb-pop 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+/* ------------------------------------------------------------------
+   採用ハンコ：「採用！」を押した瞬間が伝わるように、ここだけ例外で
+   朱色・二重枠・傾きをつける。他のステータスは丸＋グレー文字のまま
+   ------------------------------------------------------------------ */
+@keyframes kb-stamp {
+  0% {
+    opacity: 0;
+    transform: scale(2) rotate(-14deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(0.92) rotate(-9deg);
+  }
+  75% {
+    transform: scale(1.05) rotate(-11deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-10deg);
+  }
+}
+
+@utility stamp {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 2px solid var(--color-stamp);
+  box-shadow: inset 0 0 0 3px var(--color-surface), inset 0 0 0 4px var(--color-stamp);
+  color: var(--color-stamp);
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.05;
+  transform: rotate(-10deg);
+  animation: kb-stamp 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+@utility stamp-sm {
+  width: 2.75rem;
+  height: 2.75rem;
+  font-size: 0.58rem;
+  letter-spacing: 0;
+  padding: 0 2px;
+}
+
+@utility stamp-lg {
+  width: 4.25rem;
+  height: 4.25rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  border-width: 3px;
+  box-shadow: inset 0 0 0 4px var(--color-surface), inset 0 0 0 6px var(--color-stamp);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
