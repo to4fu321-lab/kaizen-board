@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { BottomNav } from "./BottomNav";
 import { RoleSwitcher } from "./RoleSwitcher";
+import { ThemeToggle } from "./ThemeToggle";
 import { ServiceWorkerRegister } from "./ServiceWorkerRegister";
 import { setRole, useDemoState } from "@/lib/store";
 
@@ -28,21 +29,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             isAdmin ? "max-w-5xl" : "max-w-[520px]"
           }`}
         >
-          <Link href={isAdmin ? "/admin" : "/"} className="flex items-center gap-2">
+          <Link href={isAdmin ? "/admin" : "/"} className="flex min-h-11 items-center gap-2">
             <span
               aria-hidden
               className="grid h-8 w-8 place-items-center rounded-lg bg-brand text-sm font-black text-white"
             >
               改
             </span>
-            <span className="text-[15px] font-bold tracking-tight text-ink">
+            <span className="text-[17px] font-bold tracking-tight text-ink">
               カイゼンボード
             </span>
-            <span className="rounded border border-line px-1.5 py-0.5 text-[10px] font-bold leading-none text-ink-faint">
+            {/* 明るさ切替を置くぶん、狭い画面ではDEMOバッジを畳む */}
+            <span className="hidden rounded border border-line px-1.5 py-0.5 text-[11px] font-bold leading-none text-ink-faint min-[400px]:inline">
               DEMO
             </span>
           </Link>
-          <RoleSwitcher />
+          <div className="flex shrink-0 items-center gap-1.5">
+            <ThemeToggle />
+            <RoleSwitcher />
+          </div>
         </div>
       </header>
 

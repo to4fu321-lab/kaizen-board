@@ -38,7 +38,7 @@ export function FirstRunIntro() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 px-4 pb-6 pt-10 sm:items-center">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-scrim/50 px-4 pb-6 pt-10 sm:items-center">
       <div className="w-full max-w-[440px] rounded-[14px] bg-surface p-5">
         <p className="text-note font-bold text-brand">カイゼンボード</p>
         <h2 className="mt-1 text-title text-ink">
@@ -69,7 +69,7 @@ export function FirstRunIntro() {
         <button
           type="button"
           onClick={close}
-          className="mt-5 min-h-14 w-full rounded-full bg-brand text-head text-white transition active:scale-[0.99]"
+          className="btn btn-lg btn-primary mt-5"
         >
           はじめる
         </button>

@@ -7,10 +7,16 @@
   --color-brand-dark: #c34503;
   --color-brand-soft: #fff3ec;
 
-  /* テキスト・面 */
+  /* テキスト・面。
+     現場は明るい倉庫でスマホを見るので、薄いグレーは白飛びして読めなくなる。
+     白背景に対するコントラスト比を実測して決めている（WCAG AAは4.5:1）
+       ink       15.6:1 … 見出し・カードタイトル・必ず読ませたい本文
+       ink-muted  7.6:1 … 本文・説明
+       ink-faint  5.0:1 … 日時などの補足。いちばん薄いここでも、
+                          カード外の薄いグレー地(#f4f6f9)に載せてAAを下回らせない */
   --color-ink: #14243a;
-  --color-ink-muted: #5f7086;
-  --color-ink-faint: #94a2b3;
+  --color-ink-muted: #4b5563;
+  --color-ink-faint: #65707e;
   --color-surface: #ffffff;
   --color-canvas: #f4f6f9;
   --color-line: #e8ecf1;
@@ -27,17 +33,94 @@
   /* 緊急度（カード左端の帯） */
   --color-danger: #d92020;
   --color-warn: #d08700;
+  /* 危険な未対応をまとめる警告ブロックの面と枠 */
+  --color-danger-soft: #fef2f2;
+  --color-danger-line: #fecaca;
 
   /* 採用ハンコ（朱色。モチベが上がる「押した」感を出す唯一の例外演出） */
   --color-stamp: #c81e1e;
+
+  /* 写真の上に重ねるものは、明暗どちらのモードでも常に暗いまま。
+     写真を見るための背景なので、テーマに合わせて明るくすると写真が見づらくなる */
+  --color-stage: #14243a;
+  --color-scrim: #14243a;
 
   --radius-card: 14px;
 
   --font-sans: var(--font-noto-sans-jp), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* ------------------------------------------------------------------
+   暗いモード。
+   倉庫の現場は高天井のLEDで明るく、その環境では白背景のほうが
+   照明の映り込みに負けず読みやすいので、既定は明るいモードのまま。
+   夜勤・早朝・冷蔵倉庫・夜間の荷捌き場のために選べるようにしている。
+
+   端末の設定（prefers-color-scheme）に従いつつ、
+   アプリ内で明示的に選んだとき（data-theme）はそちらを優先する
+   ------------------------------------------------------------------ */
 :root {
   color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --color-brand: #ff6a1f;
+    --color-brand-dark: #ffa06b;
+    --color-brand-soft: #35190c;
+
+    --color-ink: #e9eef5;
+    --color-ink-muted: #b4c0cf;
+    --color-ink-faint: #8f9db0;
+    --color-surface: #161d27;
+    --color-canvas: #0d131b;
+    --color-line: #2a3442;
+
+    --color-dot-new: #f59e0b;
+    --color-dot-reviewing: #eab308;
+    --color-dot-adopted: #34d399;
+    --color-dot-partial: #22d3ee;
+    --color-dot-progress: #60a5fa;
+    --color-dot-declined: #7b8a9d;
+
+    --color-danger: #f87171;
+    --color-warn: #eab308;
+    --color-danger-soft: #2c1517;
+    --color-danger-line: #5b2427;
+
+    --color-stamp: #ff6b6b;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-brand: #ff6a1f;
+  --color-brand-dark: #ffa06b;
+  --color-brand-soft: #35190c;
+
+  --color-ink: #e9eef5;
+  --color-ink-muted: #b4c0cf;
+  --color-ink-faint: #8f9db0;
+  --color-surface: #161d27;
+  --color-canvas: #0d131b;
+  --color-line: #2a3442;
+
+  --color-dot-new: #f59e0b;
+  --color-dot-reviewing: #eab308;
+  --color-dot-adopted: #34d399;
+  --color-dot-partial: #22d3ee;
+  --color-dot-progress: #60a5fa;
+  --color-dot-declined: #7b8a9d;
+
+  --color-danger: #f87171;
+  --color-warn: #eab308;
+  --color-danger-soft: #2c1517;
+  --color-danger-line: #5b2427;
+
+  --color-stamp: #ff6b6b;
 }
 
 html,
@@ -49,6 +132,11 @@ body {
 
 body {
   -webkit-tap-highlight-color: transparent;
+  /* 細い明朝寄りの見え方だと、明るい倉庫では線が飛んで読みにくい。
+     本文の基本を 500 にして輪郭を残す。
+     ユーティリティ（font-bold 等）のほうが必ず強いので、
+     見出しやボタンの 700／数字の 800 はそのまま効く */
+  font-weight: 500;
 }
 
 :focus-visible {
@@ -57,33 +145,38 @@ body {
 }
 
 /* ------------------------------------------------------------------
-   文字サイズは4段階だけ。数字を見せる場所のみ text-num を例外で使う
+   文字サイズは4段階だけ。数字を見せる場所のみ text-num を例外で使う。
+
+   現場はスマホを片手で持ち、手袋や明るい倉庫の中で読む。
+   いちばん多く使う text-note が小さいと全体が読みにくくなるので、
+   最小を 14px に上げ、そこから 2px ずつ積み上げる段組みにしている。
+   本文 16px は iOS で入力欄にフォーカスしても勝手に拡大されない下限でもある
    ------------------------------------------------------------------ */
 @utility text-title {
-  font-size: 1.25rem; /* 20px */
+  font-size: 1.375rem; /* 22px */
   line-height: 1.4;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
 @utility text-head {
-  font-size: 1rem; /* 16px */
+  font-size: 1.125rem; /* 18px */
   line-height: 1.5;
   font-weight: 700;
 }
 
 @utility text-body {
-  font-size: 0.875rem; /* 14px */
+  font-size: 1rem; /* 16px */
   line-height: 1.7;
 }
 
 @utility text-note {
-  font-size: 0.75rem; /* 12px */
-  line-height: 1.5;
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.6;
 }
 
 @utility text-num {
-  font-size: 1.75rem; /* 28px */
+  font-size: 1.875rem; /* 30px */
   line-height: 1.1;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
@@ -94,6 +187,118 @@ body {
   background: var(--color-surface);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-card);
+}
+
+/* ------------------------------------------------------------------
+   ボタン。
+   現場は作業用手袋をしたまま、立ったまま片手で押すことがある。
+   指先が多少ずれても当たるよう、最低48px・主要操作は56pxを確保する。
+   押した手応えは拡大縮小ではなく色で返す。作業中に画面が動くと
+   狙いが外れるうえ、揺れる倉庫内では動き自体が読み取りづらいため
+   ------------------------------------------------------------------ */
+@utility btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: 3rem; /* 48px */
+  padding-inline: 1rem;
+  border-radius: 9999px;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  transition:
+    background-color 0.12s ease,
+    border-color 0.12s ease,
+    color 0.12s ease;
+}
+
+/* 画面でいちばん進めたい操作。幅いっぱい・56px */
+@utility btn-lg {
+  min-height: 3.5rem; /* 56px */
+  width: 100%;
+}
+
+@utility btn-primary {
+  background: var(--color-brand);
+  color: #fff;
+  &:active {
+    background: var(--color-brand-dark);
+  }
+  &:disabled {
+    background: var(--color-line);
+    color: var(--color-ink-faint);
+  }
+}
+
+/* 主要ではないが、押せることがはっきり分かる必要があるもの */
+@utility btn-outline {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  color: var(--color-ink);
+  &:active {
+    background: var(--color-canvas);
+    border-color: var(--color-ink-faint);
+  }
+}
+
+/* 文字だけのリンクにしないための、枠付きの誘導行 */
+@utility btn-link-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 3rem; /* 48px */
+  padding-inline: 0.875rem;
+  border: 1px solid var(--color-line);
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-brand-dark);
+  transition: background-color 0.12s ease;
+  &:active {
+    background: var(--color-brand-soft);
+  }
+}
+
+/* 絞り込みなどの切り替えチップ。こちらも指で押せる高さを持たせる */
+@utility chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem; /* 48px */
+  padding-inline: 0.875rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  color: var(--color-ink-muted);
+  font-size: 0.875rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+
+@utility chip-on {
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: #fff;
+}
+
+/* 種類を表す小さな見出し札。色だけに頼らず、必ず絵文字＋文字で意味が分かるようにする */
+@utility tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.5;
+  border: 1px solid transparent;
 }
 
 @utility no-scrollbar {

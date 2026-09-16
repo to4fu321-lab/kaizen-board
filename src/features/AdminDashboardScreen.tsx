@@ -101,7 +101,7 @@ export function AdminDashboardScreen() {
       </section>
 
       {urgent.length > 0 ? (
-        <section className="rounded-[14px] border border-red-200 bg-red-50 p-3">
+        <section className="rounded-[14px] border border-danger-line bg-danger-soft p-3">
           <h2 className="mb-2 text-note font-bold text-danger">
             ⚠️ 今すぐ確認：危険の報告が {urgent.length}件
           </h2>
@@ -120,7 +120,8 @@ export function AdminDashboardScreen() {
       ) : null}
 
       <section className="space-y-3">
-        <div className="flex gap-2">
+        {/* 文字を大きくしてもチップが2段に割れないよう、狭い画面では横スクロールさせる */}
+        <div className="no-scrollbar flex gap-2 overflow-x-auto">
           {ADMIN_FILTERS.map((item) => {
             const count = myReports.filter((r) => item.statuses.includes(r.status)).length;
             const active = filter === item.value;
@@ -130,11 +131,7 @@ export function AdminDashboardScreen() {
                 type="button"
                 onClick={() => setFilter(item.value)}
                 aria-pressed={active}
-                className={`min-h-10 flex-1 rounded-full border text-note font-bold transition ${
-                  active
-                    ? "border-brand bg-brand text-white"
-                    : "border-line bg-surface text-ink-muted"
-                }`}
+                className={`chip flex-1 ${active ? "chip-on" : ""}`}
               >
                 {item.label}（{count}）
               </button>
@@ -144,11 +141,7 @@ export function AdminDashboardScreen() {
             type="button"
             onClick={() => setFilter("shared")}
             aria-pressed={filter === "shared"}
-            className={`min-h-10 flex-1 rounded-full border text-note font-bold transition ${
-              filter === "shared"
-                ? "border-brand bg-brand text-white"
-                : "border-line bg-surface text-ink-muted"
-            }`}
+            className={`chip flex-1 ${filter === "shared" ? "chip-on" : ""}`}
           >
             🏢 他拠点（{sharedFromOtherSites.length}）
           </button>
@@ -229,12 +222,12 @@ function ReportRow({
       <Link
         href={readOnly ? `/report/${report.id}` : `/admin/${report.id}`}
         className={`relative flex items-center gap-3 overflow-hidden rounded-[14px] border p-3 transition hover:border-ink-faint ${
-          tone === "alert" ? "border-red-200 bg-surface" : "card"
+          tone === "alert" ? "border-danger-line bg-surface" : "card"
         }`}
       >
         <UrgencyBar urgency={report.urgency} />
         <div className="min-w-0 flex-1 pl-1">
-          <p className="truncate text-head text-ink">{report.title}</p>
+          <p className="line-clamp-2 text-head text-ink">{report.title}</p>
           <p className="mt-0.5 truncate text-note text-ink-muted">{meta.join("・")}</p>
         </div>
         {report.sharedToSites ? <span title="横展開ずみ">🏢</span> : null}
